@@ -4,27 +4,34 @@ import axios from "axios";
 import Navbar from "./components/layout/Navbar";
 import Users from "./components/users/Users";
 import Search from "./components/users/Search";
+import { async } from 'q';
 
 class App extends React.Component {
   state = {
     users: [],
     loading: false
   }
-  async componentDidMount() {
-    this.setState({
-      loading: true
-    })
+  // async componentDidMount() {
+  //   this.setState({
+  //     loading: true
+  //   })
 
-    const res = await axios.get(`https://api.github.com/users?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&
+  //   const res = await axios.get(`https://api.github.com/users?client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&
+  //   client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`)
+
+  //   this.setState({
+  //     users: res.data, loading: false
+  //   })
+  // }
+
+  //Searching for users
+  searchUsers = async text => {
+    const res = await axios.get(`https://api.github.com/search/users?q=${text}&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&
     client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`)
 
     this.setState({
-      users: res.data, loading: false
+      users: res.data.items, loading: false
     })
-  }
-
-  searchUsers = (text) => {
-    console.log(text);
   }
 
   render() {
