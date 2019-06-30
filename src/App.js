@@ -4,13 +4,16 @@ import axios from "axios";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import Navbar from "./components/layout/Navbar";
 import Users from "./components/users/Users";
+import User from "./components/users/User";
 import Search from "./components/users/Search";
 import Alert from "./components/layout/Alert";
 import About from "./components/pages/About";
+import { async } from 'q';
 
 class App extends React.Component {
   state = {
     users: [],
+    user: {},
     loading: false,
     alert: null
   }
@@ -23,6 +26,17 @@ class App extends React.Component {
 
     this.setState({
       users: res.data.items, loading: false
+    })
+  }
+  //Single user details
+  getUser = async (username) => {
+    this.setState({ loading: true });
+
+    const res = await axios.get(`https://api.github.com/users/${username}?&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&
+    client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`)
+
+    this.setState({
+      user: res.data, loading: false
     })
   }
 
@@ -58,6 +72,12 @@ class App extends React.Component {
                 </Fragment>
               )} />
               <Route path="/about" exact component={About} />
+              <Route path="/user/:login" exact render={props => (
+                <User
+                  {...props} getUser={this.getUser}
+                  user={this.state.user}
+                  loading={this.state.loading} />
+              )} />
             </Switch>
 
           </div>
