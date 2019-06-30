@@ -8,14 +8,14 @@ import User from "./components/users/User";
 import Search from "./components/users/Search";
 import Alert from "./components/layout/Alert";
 import About from "./components/pages/About";
-import { async } from 'q';
 
 class App extends React.Component {
   state = {
     users: [],
     user: {},
     loading: false,
-    alert: null
+    alert: null,
+    repos: []
   }
   //Searching for users
   searchUsers = async text => {
@@ -37,6 +37,17 @@ class App extends React.Component {
 
     this.setState({
       user: res.data, loading: false
+    })
+  }
+  //Get user repos
+  getUserRepos = async (username) => {
+    this.setState({ loading: true });
+
+    const res = await axios.get(`https://api.github.com/users/${username}/repos?per_page=5&sort=created:asc&client_id=${process.env.REACT_APP_GITHUB_CLIENT_ID}&
+    client_secret=${process.env.REACT_APP_GITHUB_CLIENT_SECRET}`)
+
+    this.setState({
+      repos: res.data, loading: false
     })
   }
 
@@ -74,8 +85,11 @@ class App extends React.Component {
               <Route path="/about" exact component={About} />
               <Route path="/user/:login" exact render={props => (
                 <User
-                  {...props} getUser={this.getUser}
+                  {...props}
+                  getUser={this.getUser}
+                  getUserRepos={this.getUserRepos}
                   user={this.state.user}
+                  repos={this.state.repos}
                   loading={this.state.loading} />
               )} />
             </Switch>
